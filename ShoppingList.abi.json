@@ -11,7 +11,7 @@
 			]
 		},
 		{
-			"name": "createShopping",
+			"name": "addShopping",
 			"inputs": [
 				{"name":"name","type":"bytes"},
 				{"name":"number","type":"uint32"},
@@ -38,7 +38,15 @@
 			]
 		},
 		{
-			"name": "getShoppingStat",
+			"name": "getShopping",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"id","type":"uint32"},{"name":"name","type":"bytes"},{"name":"number","type":"uint32"},{"name":"createdAt","type":"uint64"},{"name":"isBought","type":"bool"},{"name":"price","type":"uint256"}],"name":"shop","type":"tuple[]"}
+			]
+		},
+		{
+			"name": "getSummaryShopping",
 			"inputs": [
 			],
 			"outputs": [

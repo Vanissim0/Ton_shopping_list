@@ -23,7 +23,7 @@ contract ShoppingList {
         _;
     }
 
-    function createShopping(string name, uint32 number, uint price) public onlyOwner {
+    function addShopping(string name, uint32 number, uint price) public onlyOwner {
         tvm.accept();
         countOfShopping++;
         m_shopping[countOfShopping] = Shopping(countOfShopping, name, number, now, false, 0);
@@ -45,7 +45,24 @@ contract ShoppingList {
         m_shopping[id] = thisShopping;
     }
 
-    function getShoppingStat() public view returns (SummaryShopping stat) {
+    function getShopping() public returns (Shopping[] shop) {
+        string name;
+        uint32 number;
+        uint64 createdAt;
+        bool isBought;
+        uint price;
+
+        for((uint32 id, Shopping purchase) : m_shopping) {
+            name = purchase.name;
+            number = purchase.number;
+            isBought = purchase.isBought;
+            createdAt = purchase.createdAt;
+            price = purchase.price;
+            shop.push(Shopping(id, name, number, createdAt, isBought, price));
+       }
+    }
+
+    function getSummaryShopping() public returns (SummaryShopping stat) {
 
         uint32 paidCount;
         uint32 notPaidCount;    

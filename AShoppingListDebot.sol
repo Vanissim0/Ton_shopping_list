@@ -21,6 +21,8 @@ abstract contract AShoppingListDebot is Debot, Upgradable {
     bytes m_icon;
 
     TvmCell m_ShopListCode; 
+    TvmCell m_ShopListData;
+    TvmCell m_ShopListStatInit;
     address m_address;  
     SummaryShopping m_SummaryShopping;  
     uint32 m_ShoppingId;    
@@ -31,10 +33,12 @@ abstract contract AShoppingListDebot is Debot, Upgradable {
     uint32 INITIAL_BALANCE =  200000000; 
 
 
-    function setShopListCode(TvmCell code) public {
+    function setShopListCode(TvmCell code, TvmCell data) public {
         require(msg.pubkey() == tvm.pubkey(), 101);
         tvm.accept();
         m_ShopListCode = code;
+        m_ShopListData = data;
+        m_ShopListStatInit = tvm.buildStateInit(m_ShopListCode, m_ShopListData);
     }
 
 
@@ -77,7 +81,8 @@ abstract contract AShoppingListDebot is Debot, Upgradable {
             m_masterPubKey = res;
 
             Terminal.print(0, "Checking your a Shopping list ...");
-            TvmCell deployState = tvm.insertPubkey(m_ShopListCode, m_masterPubKey);
+            // TvmCell deployState = tvm.insertPubkey(m_ShopListCode, m_masterPubKey);
+            TvmCell deployState = tvm.insertPubkey(m_ShopListStatInit, m_masterPubKey);
             m_address = address.makeAddrStd(0, tvm.hash(deployState));
             Terminal.print(0, format( "Your Shopping list contract address is {}", m_address));
             Sdk.getAccountType(tvm.functionId(checkStatus), m_address);
@@ -93,7 +98,7 @@ abstract contract AShoppingListDebot is Debot, Upgradable {
             _getSummaryShopping(tvm.functionId(setSummaryShopping));
 
         } else if (acc_type == -1)  { // acc is inactive
-            Terminal.print(0, "You don't have a TODO list yet, so a new contract with an initial balance of 0.2 tokens will be deployed");
+            Terminal.print(0, "You don't have a Shopping list yet, so a new contract with an initial balance of 0.2 tokens will be deployed");
             AddressInput.get(tvm.functionId(creditAccount),"Select a wallet for payment. We will ask you to sign two transactions");
 
         } else  if (acc_type == 0) { // acc is uninitialized
@@ -222,7 +227,7 @@ abstract contract AShoppingListDebot is Debot, Upgradable {
     function showShopping(uint32 index) public view {
         index = index;
         optional(uint256) none;
-        IShoppingList(m_address).getShoppingStat{
+        IShoppingList(m_address).getShopping{
             abiVer: 2,
             extMsg: true,
             sign: false,
@@ -289,7 +294,7 @@ abstract contract AShoppingListDebot is Debot, Upgradable {
 
     function deleteShopping(uint32 index) public{
         index = index;
-        if (m_SummaryShopping.completeCount + m_SummaryShopping.incompleteCount > 0) {
+        if (m_SummaryShopping.paidCount + m_SummaryShopping.notPaidCount > 0) {
             Terminal.input(tvm.functionId(deleteShopping_), "Enter purchase number:", false);
         } else {
             Terminal.print(0, "Sorry, you have no purchases to delete");

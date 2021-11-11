@@ -2,7 +2,7 @@ pragma ton-solidity >= 0.35.0;
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 
-import "AShoppingListDebot.sol";
+import "../AShoppingListDebot.sol";
 
 contract ShoppingDebot is AShoppingListDebot {
     function _menu() internal override {
